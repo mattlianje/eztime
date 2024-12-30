@@ -2,7 +2,7 @@
 
 **Time, made simple**
 
-**EzTime** is a simple, zero-dependency, waffer-thin wrapper around JVM ZonedDateTime to make working with your time-based logic in Scala a beauty and pleasure.
+**EzTime** is a simple, powerful, zero-dependency wrapper around [ZonedDateTime](https://docs.oracle.com/javase/8/docs/api/java/time/ZonedDateTime.html) to make working with your time-based logic in Scala 🧈✨ smooth like butter
 
 ## Features
 - Smart constructor with `fromString`
