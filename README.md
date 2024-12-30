@@ -1,4 +1,4 @@
-# eztime
+# <img src="pix/eztime.png" width="50"> eztime
 
 ** Time, made simple **
 
