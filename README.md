@@ -30,7 +30,7 @@ val myTime = EzTime.fromString("2024-01-01")
 #### `EzTimeDuration`
 Natural duration syntax, with no headscratching or thinking about pulling in ChronoUnits
 
-Time is a deceptively complex domain server-side, and in OLAP and distributed-systems. While it might seem straightforward to handle time using raw ZonedDateTime, this often leads to subtle bugs and inconsistencies that can be catastrophic in production systems. Here's why EzTime matters:
+Time is a deceptively complex domain. While it might seem straightforward to handle time using raw ZonedDateTime, this often leads to subtle bugs and inconsistencies that can be catastrophic in production systems. Here's why EzTime matters:
 
 ## Of note
 Time is a deceptively complex domain server-side, and in OLAP and distributed-systems. Java's ZonedDateTime is an excellent foundation - it's well-designed, battle-tested, and handles the complexities of calendars, leap years, and DST.
