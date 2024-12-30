@@ -17,7 +17,7 @@ import eztime._
 ```
 
 
-### Core Concepts
+## Core Concepts
 
 #### `EzTime`
 A wrapper around ZonedDateTime. You must instantiate an **EzTime** with the `fromString` or `fromStringOrThrow`
@@ -29,6 +29,29 @@ val myTime = EzTime.fromString("2024-01-01")
 
 #### `EzTimeDuration`
 Natural duration syntax, with no headscratching or thinking about pulling in ChronoUnits
+
+Time is a deceptively complex domain server-side, and in OLAP and distributed-systems. While it might seem straightforward to handle time using raw ZonedDateTime, this often leads to subtle bugs and inconsistencies that can be catastrophic in production systems. Here's why EzTime matters:
+
+## Of note
+Time is a deceptively complex domain server-side, and in OLAP and distributed-systems. Java's ZonedDateTime is an excellent foundation - it's well-designed, battle-tested, and handles the complexities of calendars, leap years, and DST. However, even with such a solid base, raw usage of ZonedDateTime often leads to subtle bugs and inconsistencies that can be catastrophic if not embarrassing in production systems (Not to mention when teams use mish-mashes of LocalDate's, and other bacchanalias of formats). Here's why EzTime matters:
+
+- **Forced Correctness**: EzTime's smart constructors ensure that invalid timestamps never enter your system. This isn't just about convenience - it's about making invalid states unrepresentable at the type level. The library enforces a crucial principle: all timestamps are assumed to be UTC/Zulu time unless explicitly specified otherwise, and when specified otherwise, must use IANA timezone identifiers (like "America/New_York") rather than raw offsets. This eliminates a whole class of timezone-related bugs by design.
+
+- **Timezone Sanity**: Timezone bugs can be million-dollar mistakes. EzTime forces explicit timezone handling, making it impossible to accidentally mix wall times from different zones.
+
+- **Business Logic as Types**: Rather than spreading time-related business logic throughout your codebase, EzTime encourages encapsulating it in type-safe extensions. This means your domain rules about time (trading hours, business days, etc.) become part of your type system.
+
+Consider this common bug:
+```scala
+/* Without EzTime - Subtle bug! */
+val timestamp = "2024-03-21 15:30"                  /* Which timezone? Server time? UTC? User's local time */
+val dateTime = LocalDateTime.parse(timestamp)       /* Silent assumption about format */
+val zoned = dateTime.atZone(ZoneId.systemDefault()) /* Dangerous implicit conversion */
+
+/* With EzTime - Explicit and safe */
+val time = EzTime.fromStringOrThrow("2024-03-21 15:30")
+val nyTime = time.toZoneOrThrow("America/New_York") /* Explicit about our intentions */
+```
 
 ### Custom Business Logic
 
@@ -77,8 +100,8 @@ val simpleTime = EzTime.fromString("2024-03-21 15:30")
 Effortlessly handle timezones:
 ```scala
 val nyTime = EzTime.fromString("2024-03-21T10:00:00-04:00[America/New_York]").get
-val tokyoTime = nyTime.toZoneOrThrow("Asia/Tokyo") // Same instant, Tokyo timezone
-val londonTime = nyTime.atZoneOrThrow("Europe/London") // Convert wall time to London
+val tokyoTime = nyTime.toZoneOrThrow("Asia/Tokyo")     /* Same instant, Tokyo timezone */
+val londonTime = nyTime.atZoneOrThrow("Europe/London") /* Convert wall time to London */
 
 val laterInNY = nyTime + 3.hours
 val evenLater = laterInNY + 30.minutes 
