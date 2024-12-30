@@ -36,10 +36,8 @@ Time is a deceptively complex domain server-side, and in OLAP and distributed-sy
 Time is a deceptively complex domain server-side, and in OLAP and distributed-systems. Java's ZonedDateTime is an excellent foundation - it's well-designed, battle-tested, and handles the complexities of calendars, leap years, and DST.
 
 - **Forced Correctness**: EzTime's smart constructors ensure that invalid timestamps never enter your system. This isn't just about convenience - it's about making invalid states unrepresentable at the type level. The library enforces a powerful 2-step system that eliminates a whole class of timezone bugs:
-   - All timestamps are assumed to be UTC/Zulu time unless explicitly specified otherwise ...
-   - When specified otherwise, must use IANA timezone identifiers (like "America/New_York") rather than raw offsets.
-
-- **Timezone Sanity**: Timezone bugs can be million-dollar mistakes. EzTime forces explicit timezone handling, making it impossible to accidentally mix wall times from different zones.
+   - (Step 1/2) All timestamps are assumed to be UTC/Zulu time unless explicitly specified otherwise ...
+   - (Step 2/2) When specified otherwise, you must use IANA timezone identifiers (like "America/New_York") rather than raw offsets.
 
 - **Business Logic as Types**: Rather than spreading time-related business logic throughout your codebase, EzTime encourages encapsulating it in type-safe extensions. This means your domain rules about time (trading hours, business days, etc.) become part of your type system.
 
