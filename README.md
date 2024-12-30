@@ -1,9 +1,8 @@
 # <img src="pix/eztime.png" width="50"> eztime
 
-** Time, made simple **
+**Time, made simple**
 
-**EzTime** is a simple, zero-dependency, waffer-thin wrapper around JVM ZonedDateTime to make working with your time based business logic
-a beauty and pleasure.
+**EzTime** is a simple, zero-dependency, waffer-thin wrapper around JVM ZonedDateTime to make working with your time-based logic in Scala a beauty and pleasure.
 
 ## Features
 - Smart constructor with `fromString`
