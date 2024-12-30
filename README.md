@@ -33,9 +33,11 @@ Natural duration syntax, with no headscratching or thinking about pulling in Chr
 Time is a deceptively complex domain server-side, and in OLAP and distributed-systems. While it might seem straightforward to handle time using raw ZonedDateTime, this often leads to subtle bugs and inconsistencies that can be catastrophic in production systems. Here's why EzTime matters:
 
 ## Of note
-Time is a deceptively complex domain server-side, and in OLAP and distributed-systems. Java's ZonedDateTime is an excellent foundation - it's well-designed, battle-tested, and handles the complexities of calendars, leap years, and DST. However, even with such a solid base, raw usage of ZonedDateTime often leads to subtle bugs and inconsistencies that can be catastrophic if not embarrassing in production systems (Not to mention when teams use mish-mashes of LocalDate's, and other bacchanalias of formats). Here's why EzTime matters:
+Time is a deceptively complex domain server-side, and in OLAP and distributed-systems. Java's ZonedDateTime is an excellent foundation - it's well-designed, battle-tested, and handles the complexities of calendars, leap years, and DST.
 
-- **Forced Correctness**: EzTime's smart constructors ensure that invalid timestamps never enter your system. This isn't just about convenience - it's about making invalid states unrepresentable at the type level. The library enforces a crucial principle: all timestamps are assumed to be UTC/Zulu time unless explicitly specified otherwise, and when specified otherwise, must use IANA timezone identifiers (like "America/New_York") rather than raw offsets. This eliminates a whole class of timezone-related bugs by design.
+- **Forced Correctness**: EzTime's smart constructors ensure that invalid timestamps never enter your system. This isn't just about convenience - it's about making invalid states unrepresentable at the type level. The library enforces a powerful 2-step system that eliminates a whole class of timezone bugs:
+   - All timestamps are assumed to be UTC/Zulu time unless explicitly specified otherwise ...
+   - When specified otherwise, must use IANA timezone identifiers (like "America/New_York") rather than raw offsets.
 
 - **Timezone Sanity**: Timezone bugs can be million-dollar mistakes. EzTime forces explicit timezone handling, making it impossible to accidentally mix wall times from different zones.
 
