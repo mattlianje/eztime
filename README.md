@@ -69,6 +69,9 @@ val parisWallTime = londonTime.atZone("Europe/Paris")
 ```scala
 object BusinessRules {
   implicit class TradingHours(val time: EzTime) {
+    import eztime.EzTimeDuration._
+    import java.time._
+
     def isWeekend: Boolean = {
       val day = time.zdt.getDayOfWeek
       day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY
@@ -77,14 +80,14 @@ object BusinessRules {
     def isNyseHours: Boolean = {
       if (isWeekend) false 
       else {
-        val nyTime = time.toZone("America/New_York")
+        val nyTime = time.toZoneOrThrow("America/New_York")
         val hour = nyTime.zdt.getHour
         hour >= 9 && hour < 16
       }
     }
     
     def nextBusinessDay: EzTime = 
-      LazyList.iterate(time + 1.day)(_.plus(1.day))
+      LazyList.iterate(time + 1.day)(_ + 1.day)
         .dropWhile(_.isWeekend)
         .head
   }
@@ -93,17 +96,16 @@ object BusinessRules {
 
 Then just use your business logic naturally as if it were baked into **EzTime**
 ```scala
-import eztime._
 import BusinessRules._
 
 val now = EzTime.fromString("2024-03-21T12:30:00Z").get
 
 if (!now.isWeekend && now.isNyseHours) {
-  println("Do my business logic")
+  println("Doing my business logic")
 }
 
 val nextDay = now.nextBusinessDay + 1.day
-println(s"next-day: ${nextDay} - the power of EzTime + EzTimeDuration!")
+println(s"next-day + 1: ${nextDay} - the power of EzTime + EzTimeDuration!")
 ```
 
 Add custom formats that fromString will handle:
@@ -119,21 +121,22 @@ object MyEzTimeExtensions {
 Initially this will give None:
 ```scala
 val chineseTime = "2024年03月21日 15:30"
-EzTime.fromString(chineseTime)
+EzTime.fromString(chineseTime) /* None */
 ```
 But import your **EzTime** extensions and tada!
 ```scala
 import MyEzTimeExtensions._
 
-EzTime.fromString(chineseTime) /* Some(...) */
+EzTime.fromString(chineseTime) /* Some(2024-03-21T15:30:00Z) */
 ```
 
 You can get a formatted string of your **EzTime** with toString / toStringOrThrow:
 ```scala
-ezTime = EzTime.fromString("2024-01-10")
+val myEzt = EzTime.fromString("2024-01-10").get
 
-EzTime.toString                         /* Returns default */
-EzTime.toStringOrThrow("yyyy年MM月dd日") /* Returns formatted string (if format is valid) */
+myEzt.toString                             /* Returns default: 2024-01-10T00:00:00Z */
+val formattedString: String =
+    myEzt.toStringOrThrow("yyyy年MM月dd日") /* Returns: 2024年01月10日 */
 ```
 
 ## Of note
