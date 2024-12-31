@@ -65,7 +65,7 @@ val parisWallTime = londonTime.atZone("Europe/Paris")
 ```
 
 ## Adding Business Logic and Formatters
-EzTime's extension system lets you encapsulate your domain specific time logic
+**EzTime**'s extension system lets you encapsulate your domain specific time logic
 
 ```scala
 object BusinessRules {
@@ -146,7 +146,7 @@ Ultimately, **EzTime** is just a zdt wrapper to force teams to code correctly an
     1. All timestamps are UTC/Zulu unless explicitly specified
     2. Non-UTC times must use IANA identifiers (e.g., "America/New_York") rather than raw offsets
 
-- **Business Logic as Types**: Rather than spreading time-related business logic throughout your codebase, EzTime encourages encapsulating it in type-safe extensions. This means your domain rules about time become part of your type system.
+- **Business Logic as Types**: Rather than spreading time-related business logic throughout your codebase, **EzTime** encourages encapsulating it in type-safe extensions. This means your domain rules about time become part of your type system.
 
 Consider this common bug:
 ```scala
