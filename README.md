@@ -64,7 +64,7 @@ val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").g
 val parisWallTime = londonTime.atZone("Europe/Paris")
 ```
 
-## Custom Logic and Formatters
+## Adding Business Logic and Formatters
 EzTime's extension system lets you encapsulate your domain specific time logic
 
 ```scala
