@@ -46,15 +46,14 @@ Natural duration syntax, with no headscratching or thinking about pulling in Chr
 val laterTime = myTime + 3.days + 9.secs - 4.nanos
 ```
 
-## Timezone Operations
+## Timezone Operations - TODO inZone, asZone
 **EzTime** provides 2 distinct ways to handle timezones:
 1. `toZone`: Preserves the instant in time, adjusts the timezone
-
 ```scala
 /* It's 2 PM in London */
 val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
 
-/* Shows as 3 PM in Paris */
+/* Shows as 2 PM in Paris */
 val parisSameInstant = londonTime.toZone("Europe/Paris")
 ```
 
@@ -63,7 +62,7 @@ val parisSameInstant = londonTime.toZone("Europe/Paris")
 /* It's 2 PM in London */
 val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
 
-/* Shows as 2 PM Paris time */
+/* Shows as 3 PM Paris time */
 val parisWallTime = londonTime.atZone("Europe/Paris")
 ```
 
