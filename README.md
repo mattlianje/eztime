@@ -107,7 +107,7 @@ val nextDay = now.nextBusinessDay + 1.day
 println(s"next-day: ${nextDay} - the power of EzTime + EzTimeDuration!")
 ```
 
-You can effortless add custom formatters:
+Add custom formats that fromString will handle:
 ```scala
 object MyEzTimeExtensions {
     import java.time.format._
