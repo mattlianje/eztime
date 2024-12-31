@@ -38,8 +38,8 @@ Ultimately, **EzTime** is just a zdt wrapper to stop
 teams from foot-gunning themselves and make working with timestamps beautiful.
 
 - **Forced Correctness**: EzTime's smart constructors ensure that invalid timestamps never enter your system. This isn't just about convenience - it's about making invalid states unrepresentable at the type level. The library enforces a powerful 2-step system that eliminates a whole class of timezone bugs:
-   - All timestamps are assumed to be UTC/Zulu time unless explicitly specified otherwise ...
-   - When specified otherwise, you must use IANA timezone identifiers (like "America/New_York") rather than raw offsets.
+   - (1/2) All timestamps are assumed to be UTC/Zulu time unless explicitly specified otherwise ...
+   - (2/2) When specified otherwise, you must use IANA timezone identifiers (like "America/New_York") rather than raw offsets.
 
 - **Business Logic as Types**: Rather than spreading time-related business logic throughout your codebase, EzTime encourages encapsulating it in type-safe extensions. This means your domain rules about time (trading hours, business days, etc.) become part of your type system.
 
