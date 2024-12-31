@@ -2,16 +2,15 @@
 
 **Time, made simple**
 
-A minimalist wrapper around ZonedDateTime making time-based logic in Scala 🧈✨ smooth like butter.
+A minimalist, zero-dependency wrapper around ZonedDateTime making time-based logic in Scala 🧈✨ smooth like butter.
 
 
 ## Features
 - Force correct time handling with type-safe constructors
 - Beautiful duration arithmetic that reads like English
 - Effortlessly extensible with custom parsers and business rules
-- Prevent timezone bugs forever: assume Zulu time, require IANA zones (no raw offsets allowed)
+- Prevent timezone bugs forever: assume Zulu time, require IANA zones
 - Drop **EzTime.scala** into your project like a header-file
-- Zero dependencies, just pure ZonedDateTime done right
 
 **EzTime** is on MavenCentral
 ```scala
