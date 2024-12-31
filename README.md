@@ -6,10 +6,12 @@ A minimalist wrapper around ZonedDateTime making time-based logic in Scala ðŸ§ˆâ
 
 
 ## Features
-- Smart constructor with `fromString`
-- Effortlessly add new formats to be parsed with `fromString`
-- Never worry about faffing around with DateTimeFormatters
-- Durations are like beautiful arithmetic
+- Force correct time handling with type-safe constructors
+- Beautiful duration arithmetic that reads like English
+- Effortlessly extensible with custom parsers and business rules
+- Prevent timezone bugs forever: assume Zulu time, require IANA zones (no raw offsets allowed)
+- Drop **EzTime.scala** into your project like a header-file
+- Zero dependencies, just pure ZonedDateTime done right
 
 To get started:
 
@@ -38,13 +40,18 @@ val laterTime = myTime + 3.hours + (30.minutes - 20.seconds)
 ```scala
 /* It's 2 PM in London */
 val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
-val parisSameInstant = londonTime.toZone("Europe/Paris")  /* Shows as 15:00 Paris */
+
+/* Shows as 3 PM in Paris */
+val parisSameInstant = londonTime.toZone("Europe/Paris")
 ```
 
 2. `atZone`: Changes the wall time to the new timezone
 ```scala
+/* It's 2 PM in London */
 val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
-val parisWallTime = londonTime.atZone("Europe/Paris")     /* Shows as 14:00 Paris time */
+
+/* Shows as 3 PM Paris time */
+val parisWallTime = londonTime.atZone("Europe/Paris")
 ```
 
 ## Of note
