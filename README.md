@@ -50,7 +50,7 @@ val parisSameInstant = londonTime.toZone("Europe/Paris")
 /* It's 2 PM in London */
 val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
 
-/* Shows as 3 PM Paris time */
+/* Shows as 2 PM Paris time */
 val parisWallTime = londonTime.atZone("Europe/Paris")
 ```
 
