@@ -27,6 +27,10 @@ To get started:
 ```scala
 import eztime._
 ```
+and to use the **EzTime** duration implicits:
+```
+import eztime.EzTimeDuration._
+```
 
 
 ## Core Concepts
@@ -39,7 +43,7 @@ val myTime = EzTime.fromString("2024-01-01")
 #### `EzTimeDuration`
 Natural duration syntax, with no headscratching or thinking about pulling in ChronoUnits. You can use singular or plural of all units from `nano(s)` to `year(s)`
 ```scala
-val laterTime = myTime + 3.hours + (30.minutes + 20.mins + 9.secs)
+val laterTime = myTime + 3.days + 9.secs - 4.nanos
 ```
 
 ## Timezone Operations
