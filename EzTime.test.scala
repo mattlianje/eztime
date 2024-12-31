@@ -3,25 +3,26 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 
 object TestExtensions {
-    import java.time._
-    import java.time.format.DateTimeFormatter
-    import java.time.temporal.ChronoUnit
+  import java.time._
+  import java.time.format.DateTimeFormatter
+  import java.time.temporal.ChronoUnit
 
-    implicit class TinyEzTime(val ezTime: EzTime) {
-        def isWeekend: Boolean = {
-        val day = ezTime.zdt.getDayOfWeek
-        day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY
-        }
-
-        def isAM: Boolean = ezTime.zdt.getHour < 12
-
-        def shortTime: String = ezTime.zdt.format(DateTimeFormatter.ofPattern("HH:mm"))
+  implicit class TinyEzTime(val ezTime: EzTime) {
+    def isWeekend: Boolean = {
+      val day = ezTime.zdt.getDayOfWeek
+      day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY
     }
+
+    def isAM: Boolean = ezTime.zdt.getHour < 12
+
+    def shortTime: String =
+      ezTime.zdt.format(DateTimeFormatter.ofPattern("HH:mm"))
+  }
 }
 
 class EzTimeTest extends munit.FunSuite {
   import EzTimeDuration._
-  
+
   test("parse valid ISO-8601 datetime strings") {
     val formats = List(
       /* Full ISO formats */
@@ -35,7 +36,7 @@ class EzTimeTest extends munit.FunSuite {
       /* TODO handle these
         "2024-03-21 15:30:00+01:00[Europe/Paris]",
         "2024-03-21 15:30:00.123+01:00",
-      */
+       */
       "2024-03-21 15:30:00",
       "2024-03-21"
     )
@@ -43,12 +44,16 @@ class EzTimeTest extends munit.FunSuite {
     formats.foreach { dt =>
       val parsed = EzTime.fromString(dt)
       assert(parsed.isDefined, s"Failed to parse: $dt")
-      
+
       if (dt.contains("[")) { /* Hack to check that tz is preserved */
         assert(parsed.get.toString.contains(dt.split("\\[")(1).dropRight(1)))
       }
       if (dt.contains("Z")) { /* Verify zulu time is at UTC offset */
-        assert(parsed.get.toString.contains("Z") || parsed.get.toString.contains("+00:00"))
+        assert(
+          parsed.get.toString.contains("Z") || parsed.get.toString.contains(
+            "+00:00"
+          )
+        )
       }
     }
   }
@@ -69,38 +74,43 @@ class EzTimeTest extends munit.FunSuite {
   }
 
   test("handle whitespace variations 2/2") {
-     val variations = List(
-       "2024-03-21T15:30:00Z",                  
-       "2024-03-21  T  15:30:00Z",             
-       "2024-03-21 T 15:30:00Z",              
-       "2024-03-21 15:30:00 Z",              
-       "2024-03-21T15:30:00 Z",             
-       "2024-03-21 T 15:30:00 +01:00",     
-       "2024-03-21T15:30:00+01:00[Europe/Paris]", 
-       //"2024-03-21 15:30:00 +01:00[Europe/Paris]" 
-     )
+    val variations = List(
+      "2024-03-21T15:30:00Z",
+      "2024-03-21  T  15:30:00Z",
+      "2024-03-21 T 15:30:00Z",
+      "2024-03-21 15:30:00 Z",
+      "2024-03-21T15:30:00 Z",
+      "2024-03-21 T 15:30:00 +01:00",
+      "2024-03-21T15:30:00+01:00[Europe/Paris]"
+      // "2024-03-21 15:30:00 +01:00[Europe/Paris]"
+    )
 
-     variations.foreach { dt =>
-       val parsed = EzTime.fromString(dt)
-       assert(parsed.isDefined, s"Failed to parse: $dt")
-     }
+    variations.foreach { dt =>
+      val parsed = EzTime.fromString(dt)
+      assert(parsed.isDefined, s"Failed to parse: $dt")
+    }
 
-     val zVariations = variations.take(5)
-     val first = EzTime.fromString(zVariations.head).get
-     zVariations.foreach { dt =>
-       val current = EzTime.fromString(dt).get
-       assertEquals(current.toString, first.toString)
-     }
-   }
+    val zVariations = variations.take(5)
+    val first = EzTime.fromString(zVariations.head).get
+    zVariations.foreach { dt =>
+      val current = EzTime.fromString(dt).get
+      assertEquals(current.toString, first.toString)
+    }
+  }
   test("parse with timezone preservation") {
-    val parisTime = EzTime.fromString("2024-03-21T15:30:00+01:00[Europe/Paris]").get
+    val parisTime =
+      EzTime.fromString("2024-03-21T15:30:00+01:00[Europe/Paris]").get
     assert(parisTime.toString.contains("Europe/Paris"))
-    
+
     val utcTime = EzTime.fromString("2024-03-21T15:30:00Z").get
-    assert(utcTime.toString.contains("Z") || utcTime.toString.contains("+00:00"))
-    
+    assert(
+      utcTime.toString.contains("Z") || utcTime.toString.contains("+00:00")
+    )
+
     val noZoneTime = EzTime.fromString("2024-03-21T15:30:00").get
-    assert(utcTime.toString.contains("Z") || utcTime.toString.contains("+00:00"))
+    assert(
+      utcTime.toString.contains("Z") || utcTime.toString.contains("+00:00")
+    )
   }
 
   test("return None for invalid datetime strings") {
@@ -129,29 +139,30 @@ class EzTimeTest extends munit.FunSuite {
     }
   }
 
-
   test("demonstrate difference between atZone and toZone") {
-    val londonTime = EzTime.fromStringOrThrow("2024-03-21T14:00:00+00:00[Europe/London]")
-    
+    val londonTime =
+      EzTime.fromStringOrThrow("2024-03-21T14:00:00+00:00[Europe/London]")
+
     val parisTimeAtZone = londonTime.atZoneOrThrow("Europe/Paris")
     assertEquals(parisTimeAtZone.zdt.getHour, 15)
-    
+
     val parisTimeToZone = londonTime.toZoneOrThrow("Europe/Paris")
     assertEquals(parisTimeToZone.zdt.getHour, 14)
   }
 
   test("handle various duration units") {
-    val baseTime = EzTime.fromStringOrThrow("2024-03-21T15:30:00+01:00[Europe/Paris]")
-    
+    val baseTime =
+      EzTime.fromStringOrThrow("2024-03-21T15:30:00+01:00[Europe/Paris]")
+
     val withSeconds = baseTime + 30.seconds
     assertEquals(withSeconds.zdt.getSecond, (baseTime.zdt.getSecond + 30) % 60)
-    
+
     val withMinutes = baseTime + 45.minutes
     assertEquals(withMinutes.zdt.getMinute, (baseTime.zdt.getMinute + 45) % 60)
-    
+
     val withHours = baseTime + 2.hours
     assertEquals(withHours.zdt.getHour, (baseTime.zdt.getHour + 2) % 24)
-    
+
     val withDays = baseTime + 5.days
     assertEquals(withDays.zdt.getDayOfMonth, baseTime.zdt.getDayOfMonth + 5)
   }
@@ -167,18 +178,22 @@ class EzTimeTest extends munit.FunSuite {
   }
 
   test("handle negative durations") {
-    val baseTime = EzTime.fromStringOrThrow("2024-03-21T15:30:00+01:00[Europe/Paris]")
+    val baseTime =
+      EzTime.fromStringOrThrow("2024-03-21T15:30:00+01:00[Europe/Paris]")
     val withNegative = baseTime - 30.minutes
-    assertEquals(withNegative.zdt.getMinute, (baseTime.zdt.getMinute - 30 + 60) % 60)
+    assertEquals(
+      withNegative.zdt.getMinute,
+      (baseTime.zdt.getMinute - 30 + 60) % 60
+    )
   }
 
   test("mini extensions work") {
     import TestExtensions._
-    
+
     val weekday = EzTime.fromString("2024-03-21T15:30:00Z").get /* Thursday */
     val weekend = EzTime.fromString("2024-03-23T15:30:00Z").get /* Saturday */
     val morning = EzTime.fromString("2024-03-21T09:30:00Z").get
-    
+
     assert(!weekday.isWeekend)
     assert(weekend.isWeekend)
     assert(morning.isAM)
@@ -187,7 +202,7 @@ class EzTimeTest extends munit.FunSuite {
   }
 
   test("use single implicit formatter") {
-    implicit val americanFormat: DateTimeFormatter = 
+    implicit val americanFormat: DateTimeFormatter =
       DateTimeFormatter.ofPattern("MM/dd/yyyy HH:mm")
 
     val time = EzTime.fromString("03/21/2024 15:30")
@@ -213,17 +228,17 @@ class EzTimeTest extends munit.FunSuite {
   test("calculate time between in various units") {
     val time1 = EzTime.fromStringOrThrow("2024-03-21T14:30:00Z")
     val time2 = EzTime.fromStringOrThrow("2024-03-21T16:45:30Z")
-    
+
     assertEquals(time2.between(time1, ChronoUnit.HOURS), 2L)
     assertEquals(time2.between(time1, ChronoUnit.MINUTES), 135L)
     assertEquals(time2.between(time1, ChronoUnit.SECONDS), 8130L)
-    
+
     assertEquals(time1.between(time2, ChronoUnit.MINUTES), -135L)
   }
 
   test("toString with custom patterns") {
     val time = EzTime.fromStringOrThrow("2024-03-21T15:30:45Z")
-    
+
     assertEquals(time.toString("yyyy年MM月dd日"), Some("2024年03月21日"))
     assertEquals(time.toString("HH時mm分ss秒"), Some("15時30分45秒"))
     assertEquals(time.toString("dd/MM/yyyy"), Some("21/03/2024"))
@@ -231,7 +246,7 @@ class EzTimeTest extends munit.FunSuite {
 
   test("handle invalid patterns") {
     val time = EzTime.fromStringOrThrow("2024-03-21T15:30:45Z")
-    
+
     assert(time.toString("invalid pattern").isEmpty)
     intercept[IllegalArgumentException] {
       time.toStringOrThrow("invalid pattern")
@@ -240,22 +255,23 @@ class EzTimeTest extends munit.FunSuite {
 
   test("convert between EzTime and ZonedDateTime") {
     val originalZdt = ZonedDateTime.parse("2024-03-21T15:30:00Z")
-    
+
     val implicitEz: EzTime = originalZdt
     val explicitEz = EzTime.toEzTime(originalZdt)
-    
+
     val backToZdt = explicitEz.toZdt
-    
+
     assertEquals(implicitEz.toString, explicitEz.toString)
     assertEquals(backToZdt, originalZdt)
   }
 
   test("maintain timezone information during conversion") {
-    val parisZdt = ZonedDateTime.parse("2024-03-21T15:30:00+01:00[Europe/Paris]")
-    
+    val parisZdt =
+      ZonedDateTime.parse("2024-03-21T15:30:00+01:00[Europe/Paris]")
+
     val implicitEz: EzTime = parisZdt
     val explicitEz = EzTime.toEzTime(parisZdt)
-    
+
     assertEquals(implicitEz.toZdt.getZone.getId, "Europe/Paris")
     assertEquals(explicitEz.toZdt.getZone.getId, "Europe/Paris")
     assertEquals(explicitEz.toZdt.getOffset.toString, "+01:00")

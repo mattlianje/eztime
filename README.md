@@ -2,7 +2,8 @@
 
 **Time, made simple**
 
-**EzTime** is a simple, powerful, zero-dependency wrapper around ZonedDateTime to make working with your time-based logic in Scala 🧈✨ smooth like butter.
+A minimalist wrapper around ZonedDateTime making time-based logic in Scala 🧈✨ smooth like butter.
+
 
 ## Features
 - Smart constructor with `fromString`
@@ -18,18 +19,33 @@ import eztime._
 
 
 ## Core Concepts
-
-#### `EzTime`
-A wrapper around ZonedDateTime. You must instantiate an **EzTime** with the `fromString` or `fromStringOrThrow`
-smart constructors. This prevents invalidate date strings from ever entering your domain.
-
+#### `EzTime`  
+A wrapper around ZonedDateTime. You must instantiate an **EzTime** with the `fromString` or `fromStringOrThrow` smart constructors. This prevents invalidate date strings from ever entering your domain.
 ```scala
 val myTime = EzTime.fromString("2024-01-01")
 ```
 
 #### `EzTimeDuration`
-Natural duration syntax, with no headscratching or thinking about pulling in ChronoUnits
-:
+Natural duration syntax, with no headscratching or thinking about pulling in ChronoUnits. You can use singular or plural of all units from `nano(s)` to `year(s)`
+```scala
+val laterTime = myTime + 3.hours + (30.minutes - 20.seconds)
+```
+
+## Timezone Operations
+**EzTime** provides 2 distinct ways to handle timezones:
+1. `toZone`: Preserves the instant in time, adjusts the timezone
+
+```scala
+/* It's 2 PM in London */
+val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
+val parisSameInstant = londonTime.toZone("Europe/Paris")  /* Shows as 15:00 Paris */
+```
+
+2. `atZone`: Changes the wall time to the new timezone
+```scala
+val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
+val parisWallTime = londonTime.atZone("Europe/Paris")     /* Shows as 14:00 Paris time */
+```
 
 ## Of note
 Time is a deceptively complex domain. Java's ZonedDateTime is an excellent foundation - it's well-designed, battle-tested, and handles the complexities of calendars, leap years, and DST. 
@@ -37,10 +53,10 @@ Time is a deceptively complex domain. Java's ZonedDateTime is an excellent found
 Ultimately, **EzTime** is just a zdt wrapper to force teams to code correctly and make working with time logic beautiful.
 
 - **Forced Correctness**: EzTime's smart constructors ensure that invalid timestamps never enter your system. This isn't just about convenience - it's about making invalid states unrepresentable at the type level. The library enforces a powerful 2-step system that eliminates a whole class of timezone bugs
-   - step 1/2: All timestamps are assumed to be UTC/Zulu time unless explicitly specified otherwise ...
-   - step 2/2: When specified otherwise, you must use IANA timezone identifiers (like "America/New_York") rather than raw offsets.
+    1. All timestamps are UTC/Zulu unless explicitly specified
+    2. Non-UTC times must use IANA identifiers (e.g., "America/New_York") rather than raw offsets
 
-- **Business Logic as Types**: Rather than spreading time-related business logic throughout your codebase, EzTime encourages encapsulating it in type-safe extensions. This means your domain rules about time (trading hours, business days, etc.) become part of your type system.
+- **Business Logic as Types**: Rather than spreading time-related business logic throughout your codebase, EzTime encourages encapsulating it in type-safe extensions. This means your domain rules about time become part of your type system.
 
 Consider this common bug:
 ```scala
@@ -61,49 +77,72 @@ EzTime's extension system lets you encapsulate your domain specific time logic
 ```scala
 object BusinessRules {
   implicit class TradingHours(val time: EzTime) {
-    def isTradingHour: Boolean = {
-      if (time.isWeekend) false 
+    def isWeekend: Boolean = {
+      val day = time.zdt.getDayOfWeek
+      day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY
+    }
+    
+    def isNyseHours: Boolean = {
+      if (isWeekend) false 
       else {
         val nyTime = time.toZone("America/New_York")
         val hour = nyTime.zdt.getHour
-        hour >= 9 && hour < 16 /* NYSE hours */
+        hour >= 9 && hour < 16
       }
     }
     
-    def isMarketOpen: Boolean = {
-      if (!isTradingHour) false
-      else !isHoliday
-    }
-    
-    def nextTradingDay: EzTime = {
-      var next = time + 1.day
-      while (next.isWeekend || isHoliday(next)) {
-        next = next + 1.day
-      }
-      next
+    def nextBusinessDay: EzTime = 
+      LazyList.iterate(time + 1.day)(_.plus(1.day))
+        .dropWhile(_.isWeekend)
+        .head
+  }
+
+  implicit class MultiTimeRules(val times: (EzTime, EzTime)) {
+    def areOnSameBusinessDay: Boolean = {
+      val (t1, t2) = times
+      !t1.isWeekend && !t2.isWeekend &&
+      t1.toZone("America/New_York").zdt.toLocalDate == 
+      t2.toZone("America/New_York").zdt.toLocalDate
     }
   }
 }
 ```
 
-Then just use your business logic as if it were baked into **EzTime**
-
-
-
-### Examples
-
-Smart parsing that just works:
+Then just use your business logic naturally as if it were baked into **EzTime**
 ```scala
-val time = EzTime.fromString("2024-03-21T15:30:00+01:00[Europe/Paris]")
-val simpleTime = EzTime.fromString("2024-03-21 15:30")
+import eztime._
+import BusinessRules._
+
+val now = EzTime.fromString("2024-03-21T12:30:00Z").get
+
+if (!now.isWeekend && now.isNyseHours) {
+  /* Do your logic */
+}
+
+val nextDay = now.nextBusinessDay
+
+/* Multi-time logic */
+val orderTime = EzTime.fromString("2024-03-21T13:45:00Z").get
+val fillTime = EzTime.fromString("2024-03-21T14:30:00Z").get
+
+if ((orderTime, fillTime).areOnSameBusinessDay) {
+  /* Do your logic */
+}
 ```
 
-Effortlessly handle timezones:
+Parse custom date formats by pulling (Seq) of DateTimeFormatter(s) into implicit scope:
 ```scala
-val nyTime = EzTime.fromString("2024-03-21T10:00:00-04:00[America/New_York]").get
-val tokyoTime = nyTime.toZoneOrThrow("Asia/Tokyo")     /* Same instant, Tokyo timezone */
-val londonTime = nyTime.atZoneOrThrow("Europe/London") /* Convert wall time to London */
+/* Default EzTime can't parse this format */
+val chineseTime = "2024年03月21日 15:30"
 
-val laterInNY = nyTime + 3.hours
-val evenLater = laterInNY + 30.minutes 
+EzTime.fromString(chineseTime)  /* Returns None */
+
+/* Add custom formatters */
+implicit val formatters: Seq[DateTimeFormatter] = Seq(
+ DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm")
+)
+
+/* Now they all parse successfully! */
+val anotherChineseTime = EzTime.fromString("2024年03月21日 15:30")   /* Some(EzTime(...)) */
 ```
+
