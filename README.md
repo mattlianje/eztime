@@ -144,6 +144,23 @@ val formattedString: String =
     myEzt.toStringOrThrow("yyyy年MM月dd日") /* Returns: 2024年01月10日 */
 ```
 
+## Date String Formats
+EzTime supports parsing a variety of date-time formats out of the box:
+
+| Format | Example | Notes |
+|--------|---------|-------|
+| Full ISO with zone | `2024-03-21T15:30:00+01:00[Europe/Paris]` | Preserves timezone |
+| ISO with offset | `2024-03-21T15:30:00+01:00` | Preserves offset |
+| UTC/Zulu time | `2024-03-21T15:30:00Z` | |
+| ISO without zone | `2024-03-21T15:30:00` | Assumes UTC |
+| With milliseconds | `2024-03-21T15:30:00.123Z` | |
+| With ms and offset | `2024-03-21T15:30:00.123+01:00` | |
+| Space separator | `2024-03-21 15:30:00` | Space instead of T |
+| Date only | `2024-03-21` | Assumes 00:00:00 UTC |
+| Flexible spacing | `2024-03-21  T  15:30:00Z` | Extra spaces allowed |
+
+All formats without an explicit timezone default to UTC. Custom formats can be added via implicit formatters.
+
 ## Of note
 Time is a deceptively complex domain. Java's ZonedDateTime is an excellent foundation - it's well-designed, battle-tested, and handles the complexities of calendars, leap years, and DST. 
 
