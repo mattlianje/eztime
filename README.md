@@ -28,7 +28,7 @@ To get started:
 import eztime._
 ```
 and to use the **EzTime** duration implicits:
-```
+```scala
 import eztime.EzTimeDuration._
 ```
 
