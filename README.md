@@ -6,8 +6,8 @@ A minimalist, zero-dependency wrapper around ZonedDateTime making time-based log
 
 
 ## Features
-- Force correct time handling with type-safe constructors
-- Beautiful duration arithmetic that reads like English
+- Forces correct time handling with type-safe constructors
+- Duration arithmetic that reads like English
 - Effortlessly extensible with custom parsers and business rules
 - Prevent timezone bugs forever: assume Zulu time, require IANA zones
 - Drop **EzTime.scala** into your project like a header-file
