@@ -47,6 +47,21 @@ Natural duration syntax, with no headscratching or thinking about pulling in Chr
 val laterTime = myTime + 3.days + 9.secs - 4.nanos
 ```
 
+EzTime supports these duration units:
+
+| Unit          | Variations                        | Example Usage |
+|--------------|-----------------------------------|---------------|
+| Nanoseconds  | nano, nanos, nanosecond(s)       | `5.nanos`     |
+| Microseconds | micro, micros, microsecond(s)    | `10.micros`   |
+| Milliseconds | milli, millis, millisecond(s)    | `100.millis`  |
+| Seconds      | second, seconds, sec, secs       | `30.seconds`  |
+| Minutes      | minute, minutes, min, mins       | `5.minutes`   |
+| Hours        | hour, hours                      | `2.hours`     |
+| Days         | day, days                        | `7.days`      |
+| Weeks        | week, weeks                      | `2.weeks`     |
+| Months       | month, months                    | `3.months`    |
+| Years        | year, years                      | `1.year`      |
+
 ## Timezone Operations
 **EzTime** provides 2 distinct ways to handle timezones:
 
