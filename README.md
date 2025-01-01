@@ -47,7 +47,7 @@ Natural duration syntax, with no headscratching or thinking about pulling in Chr
 val laterTime = myTime + 3.days + 9.secs - 4.nanos
 ```
 
-## Timezone Operations - TODO inZone, asZone
+## Timezone Operations
 **EzTime** provides 2 distinct ways to handle timezones:
 
 1. `inZone`: Changes the wall time to the new timezone
