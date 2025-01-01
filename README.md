@@ -49,22 +49,23 @@ val laterTime = myTime + 3.days + 9.secs - 4.nanos
 
 ## Timezone Operations - TODO inZone, asZone
 **EzTime** provides 2 distinct ways to handle timezones:
-1. `toZone`: Preserves the instant in time, adjusts the timezone
-```scala
-/* It's 2 PM in London */
-val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
 
-/* Shows as 2 PM in Paris */
-val parisSameInstant = londonTime.toZone("Europe/Paris")
-```
-
-2. `atZone`: Changes the wall time to the new timezone
+1. `inZone`: Changes the wall time to the new timezone
 ```scala
 /* It's 2 PM in London */
 val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
 
 /* Shows as 3 PM Paris time */
-val parisWallTime = londonTime.atZone("Europe/Paris")
+val parisWallTime = londonTime.inZone("Europe/Paris")
+```
+
+2. `asZone`: Preserves the instant in time, adjusts the timezone
+```scala
+/* It's 2 PM in London */
+val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
+
+/* Shows as 2 PM in Paris */
+val parisSameInstant = londonTime.asZone("Europe/Paris")
 ```
 
 ## Adding Business Logic and Formatters
@@ -112,7 +113,7 @@ val nextDay = now.nextBusinessDay + 1.day
 println(s"next-day + 1: ${nextDay} - the power of EzTime + EzTimeDuration!")
 ```
 
-Add custom formats that fromString will handle:
+Add custom formats that `fromString` will handle:
 ```scala
 object MyEzTimeExtensions {
     import java.time.format._
