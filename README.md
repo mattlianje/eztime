@@ -26,7 +26,11 @@ To get started:
 
 ```scala
 import eztime._
-import eztime.EzTimeDuration._ /* To use the EzTime duration implicits */
+```
+
+And to use the **EzTime** duration implicits:
+```scala
+import eztime.EzTimeDuration._
 ```
 
 
