@@ -40,6 +40,10 @@ A wrapper around ZonedDateTime. You must instantiate an **EzTime** with the `fro
 ```scala
 val myTime = EzTime.fromString("2024-01-01")
 ```
+`now` always gives the current UTC time (no faffing about with server/local times):
+```scala
+EzTime.now
+```
 
 #### `EzTimeDuration`
 Natural duration syntax, with no headscratching or thinking about pulling in ChronoUnits. You can use singular or plural of all units from `nano(s)` to `year(s)`
