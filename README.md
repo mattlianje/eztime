@@ -1,3 +1,50 @@
+```scala
+//> using dep xyz.matthieucourt::eztime:0.0.3
+import eztime._
+
+/* Make invalid time-strings unrepresentable */
+val timestamp: EzTime = EzTime.fromStringOrThrow("2024-03-21 14:00:00") /* Always assumes UTC */
+
+/* Its just a wrapper around the great Java ZonedDateTime */
+val zdt: ZonedDateTime = timestamp.zdt
+
+/* Natural duration arithmetic */
+val later = timestamp + 3.days + 2.hours - 30.minutes
+
+/* Clear, safe timezone handling */
+val nyTime    = later.inZone("America/New_York") /* What time is it in NY? */
+val tokyoTime = later.asZone("Asia/Tokyo")       /* Show this time as Tokyo time */
+
+/* Beautiful, easy formatting */
+later.toString                                  /* 2024-03-24T15:30:00Z */
+later.toString("yyyy年MM月dd日 HH時mm分")         /* Some(2024年03月24日 15時30分) */
+
+
+/* Add your biz logic, customer format parsers */
+object MyBusinessLogic {
+  import EzTimeDuration._
+  import java.time.DayOfWeek
+
+  implicit class MarketHours(time: EzTime) {
+    private def isWeekend = {
+      val day = time.zdt.getDayOfWeek
+      day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY
+    }
+    
+    def isNyseOpen: Boolean = {
+      if (isWeekend) false else {
+        val nyTime = time.inZone("America/New_York").get
+        nyTime.zdt.getHour >= 9 && nyTime.zdt.getHour < 16
+      }
+    }
+  }
+}
+
+/* Use it naturally */
+import MyBusinessLogic._
+if (timestamp.isNyseOpen) println("Market is open!")
+```
+
 # <img src="pix/eztime.png" width="50"> eztime
 
 **Time, made simple**
