@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="pix/eztime-demo.png" width="700">
+</p>
+
 # <img src="pix/eztime.png" width="50"> eztime
 
 **Time, made simple**
