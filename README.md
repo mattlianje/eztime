@@ -18,12 +18,17 @@ A minimalist, zero-dependency wrapper around ZonedDateTime making time-based log
 
 **EzTime** is on MavenCentral
 ```scala
-"xyz.matthieucourt" % "eztime_2.13" % "0.0.2"
+"xyz.matthieucourt" % "eztime_2.13" % "0.0.3"
 ```
 
 Try it in your repl:
 ```bash
-scala-cli repl --dep xyz.matthieucourt:eztime_2.13:0.0.2
+scala-cli repl --dep xyz.matthieucourt:eztime_2.13:0.0.3
+```
+
+Or paste in any scala-cli script:
+```scala
+//> using dep xyz.matthieucourt::eztime:0.0.3
 ```
 
 To get started:
