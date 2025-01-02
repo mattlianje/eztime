@@ -26,11 +26,6 @@ Try it in your repl:
 scala-cli repl --dep xyz.matthieucourt:eztime_2.13:0.0.3
 ```
 
-Or paste in any scala-cli script:
-```scala
-//> using dep xyz.matthieucourt::eztime:0.0.3
-```
-
 To get started:
 
 ```scala
