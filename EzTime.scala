@@ -1,3 +1,5 @@
+package eztime
+
 import java.time._
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -5,26 +7,26 @@ import scala.util.{Try, Success, Failure}
 import scala.util.matching._
 
 sealed abstract case class EzTime private (zdt: ZonedDateTime) {
-  def atZone(zoneId: String): Option[EzTime] = {
+  def inZone(zoneId: String): Option[EzTime] = {
     Try(ZoneId.of(zoneId)).toOption.map(zone =>
       EzTime.unsafeCreate(zdt.withZoneSameInstant(zone))
     )
   }
 
-  def toZone(zoneId: String): Option[EzTime] = {
+  def asZone(zoneId: String): Option[EzTime] = {
     Try(ZoneId.of(zoneId)).toOption.map(zone =>
       EzTime.unsafeCreate(zdt.withZoneSameLocal(zone))
     )
   }
 
-  def atZoneOrThrow(zoneId: String): EzTime = {
-    atZone(zoneId).getOrElse(
+  def inZoneOrThrow(zoneId: String): EzTime = {
+    inZone(zoneId).getOrElse(
       throw new IllegalArgumentException(s"Invalid zone ID: $zoneId")
     )
   }
 
-  def toZoneOrThrow(zoneId: String): EzTime = {
-    toZone(zoneId).getOrElse(
+  def asZoneOrThrow(zoneId: String): EzTime = {
+    asZone(zoneId).getOrElse(
       throw new IllegalArgumentException(s"Invalid zone ID: $zoneId")
     )
   }
@@ -100,17 +102,15 @@ object EzTime {
     )
   }
 
-  def now(zoneId: String = ZoneId.systemDefault().getId): Option[EzTime] = {
-    Try(ZoneId.of(zoneId)).toOption.map(zone =>
-      unsafeCreate(ZonedDateTime.now(zone))
-    )
-  }
+  def now: EzTime = unsafeCreate(ZonedDateTime.now(ZoneOffset.UTC))
+
   implicit def toEzTime(zdt: ZonedDateTime): EzTime = unsafeCreate(zdt)
 }
 
 object EzTimeDuration {
   implicit class DurationInt(n: Int) {
     private def toDuration(unit: ChronoUnit) = Duration.of(n.toLong, unit)
+    private def toPeriod(n: Int) = Period.of(0, 0, n * 7)
 
     def nano = toDuration(ChronoUnit.NANOS)
     def nanos = nano
@@ -143,6 +143,7 @@ object EzTimeDuration {
     def day = toDuration(ChronoUnit.DAYS)
     def days = day
 
+    /*
     def week = toDuration(ChronoUnit.WEEKS)
     def weeks = week
 
@@ -151,6 +152,16 @@ object EzTimeDuration {
 
     def year = Duration.of(n.toLong, ChronoUnit.YEARS)
     def years = year
+     */
+
+    def week = toPeriod(n)
+    def weeks = week
+
+    def month = Period.ofMonths(n)
+    def months = month
+
+    def year = Period.ofYears(n)
+    def years = year
   }
 
   implicit class EzTimeWithDuration(ezTime: EzTime) {
@@ -158,5 +169,10 @@ object EzTimeDuration {
       EzTime.unsafeCreate(ezTime.zdt.plus(duration))
     def -(duration: Duration): EzTime =
       EzTime.unsafeCreate(ezTime.zdt.minus(duration))
+
+    def +(period: Period): EzTime =
+      EzTime.unsafeCreate(ezTime.zdt.plus(period))
+    def -(period: Period): EzTime =
+      EzTime.unsafeCreate(ezTime.zdt.minus(period))
   }
 }

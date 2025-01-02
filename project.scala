@@ -3,7 +3,7 @@
 
 //> using publish.name "eztime"
 //> using publish.organization "xyz.matthieucourt"
-//> using publish.version "0.0.1"
+//> using publish.version "0.0.2"
 //> using publish.url "https://github.com/mattlianje/eztime"
 //> using publish.vcs "github:mattlianje/eztime"
 //> using publish.license "GPL-3.0"

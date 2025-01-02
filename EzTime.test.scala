@@ -1,3 +1,5 @@
+package eztime
+
 import java.time._
 import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
@@ -33,10 +35,6 @@ class EzTimeTest extends munit.FunSuite {
       /* With milliseconds ... TODO ... nanos and all other */
       "2024-03-21T15:30:00.123+01:00[Europe/Paris]",
       "2024-03-21T15:30:00.123Z",
-      /* TODO handle these
-        "2024-03-21 15:30:00+01:00[Europe/Paris]",
-        "2024-03-21 15:30:00.123+01:00",
-       */
       "2024-03-21 15:30:00",
       "2024-03-21"
     )
@@ -82,7 +80,6 @@ class EzTimeTest extends munit.FunSuite {
       "2024-03-21T15:30:00 Z",
       "2024-03-21 T 15:30:00 +01:00",
       "2024-03-21T15:30:00+01:00[Europe/Paris]"
-      // "2024-03-21 15:30:00 +01:00[Europe/Paris]"
     )
 
     variations.foreach { dt =>
@@ -139,15 +136,15 @@ class EzTimeTest extends munit.FunSuite {
     }
   }
 
-  test("demonstrate difference between atZone and toZone") {
+  test("demonstrate difference between inZone and asZone") {
     val londonTime =
       EzTime.fromStringOrThrow("2024-03-21T14:00:00+00:00[Europe/London]")
 
-    val parisTimeAtZone = londonTime.atZoneOrThrow("Europe/Paris")
-    assertEquals(parisTimeAtZone.zdt.getHour, 15)
+    val parisTimeInZone = londonTime.inZoneOrThrow("Europe/Paris")
+    assertEquals(parisTimeInZone.zdt.getHour, 15)
 
-    val parisTimeToZone = londonTime.toZoneOrThrow("Europe/Paris")
-    assertEquals(parisTimeToZone.zdt.getHour, 14)
+    val parisTimeAsZone = londonTime.asZoneOrThrow("Europe/Paris")
+    assertEquals(parisTimeAsZone.zdt.getHour, 14)
   }
 
   test("handle various duration units") {
@@ -165,6 +162,28 @@ class EzTimeTest extends munit.FunSuite {
 
     val withDays = baseTime + 5.days
     assertEquals(withDays.zdt.getDayOfMonth, baseTime.zdt.getDayOfMonth + 5)
+  }
+
+  test("handle duration units 2") {
+    val baseTime = EzTime.fromStringOrThrow("2024-03-21T15:30:00Z")
+
+    val twoWeeksLater = baseTime + 2.weeks
+    assertEquals(twoWeeksLater.zdt.getDayOfMonth, 4)
+
+    val threeMonthsLater = baseTime + 3.months
+    assertEquals(threeMonthsLater.zdt.getMonth, Month.JUNE)
+    assertEquals(threeMonthsLater.zdt.getDayOfMonth, 21)
+
+    val twoYearsLater = baseTime + 2.years
+    assertEquals(twoYearsLater.zdt.getYear, 2026)
+
+    val threeWeeksEarlier = baseTime - 3.weeks
+    assertEquals(threeWeeksEarlier.zdt.getMonth, Month.FEBRUARY)
+    assertEquals(threeWeeksEarlier.zdt.getDayOfMonth, 29)
+
+    val complex = baseTime + 2.weeks + 1.month + 3.days
+    assertEquals(complex.zdt.getMonth, Month.MAY)
+    assertEquals(complex.zdt.getDayOfMonth, 7)
   }
 
   test("support case-insensitive unit names") {
@@ -185,6 +204,12 @@ class EzTimeTest extends munit.FunSuite {
       withNegative.zdt.getMinute,
       (baseTime.zdt.getMinute - 30 + 60) % 60
     )
+  }
+
+  test("verify UTC now functionality") {
+    val utcNow = EzTime.now
+    assertEquals(utcNow.zdt.getZone, ZoneOffset.UTC)
+    assert(utcNow.toString.contains("Z") || utcNow.toString.contains("+00:00"))
   }
 
   test("mini extensions work") {
