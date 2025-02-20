@@ -109,7 +109,7 @@ object BusinessRules {
     def isNyseHours: Boolean = {
       if (isWeekend) false 
       else {
-        val nyTime = time.toZoneOrThrow("America/New_York")
+        val nyTime = time.inZoneOrThrow("America/New_York")
         val hour = nyTime.zdt.getHour
         hour >= 9 && hour < 16
       }
