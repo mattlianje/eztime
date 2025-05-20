@@ -7,6 +7,7 @@
 **Time, made simple**
 
 A minimalist, zero-dependency wrapper around ZonedDateTime making time-based logic in Scala 🧈✨ smooth like butter.
+Part of [d4s](https://github.com/mattlianje/d4s)
 
 
 ## Features
@@ -18,12 +19,12 @@ A minimalist, zero-dependency wrapper around ZonedDateTime making time-based log
 
 **EzTime** is on MavenCentral
 ```scala
-"xyz.matthieucourt" % "eztime_2.13" % "0.0.2"
+"xyz.matthieucourt" % "eztime_2.13" % "0.0.3"
 ```
 
 Try it in your repl:
 ```bash
-scala-cli repl --dep xyz.matthieucourt:eztime_2.13:0.0.2
+scala-cli repl --dep xyz.matthieucourt:eztime_2.13:0.0.3
 ```
 
 To get started:
@@ -108,7 +109,7 @@ object BusinessRules {
     def isNyseHours: Boolean = {
       if (isWeekend) false 
       else {
-        val nyTime = time.toZoneOrThrow("America/New_York")
+        val nyTime = time.inZoneOrThrow("America/New_York")
         val hour = nyTime.zdt.getHour
         hour >= 9 && hour < 16
       }
