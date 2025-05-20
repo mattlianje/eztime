@@ -28,12 +28,12 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      inkscape:zoom="0.43217508"
-     inkscape:cx="684.90761"
+     inkscape:cx="686.06455"
      inkscape:cy="535.66254"
      inkscape:window-width="1632"
      inkscape:window-height="822"
      inkscape:window-x="388"
-     inkscape:window-y="312"
+     inkscape:window-y="284"
      inkscape:window-maximized="0"
      inkscape:current-layer="layer1" />
   <defs
@@ -134,16 +134,5 @@
        cx="175.093"
        cy="108.36176"
        r="0.20386702" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:35.2778px;font-family:Iosevka;-inkscape-font-specification:Iosevka;opacity:0.889175;fill:#eff125;fill-opacity:1;stroke-width:0.264583"
-       x="72.853378"
-       y="257.74179"
-       id="text159"><tspan
-         sodipodi:role="line"
-         id="tspan159"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:35.2778px;font-family:Iosevka;-inkscape-font-specification:Iosevka;fill:#eff125;fill-opacity:1;stroke-width:0.264583"
-         x="72.853378"
-         y="257.74179">~&gt;EzTime</tspan></text>
   </g>
 </svg>
