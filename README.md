@@ -7,7 +7,7 @@
 **Time, made simple**
 
 A minimalist, zero-dependency wrapper around ZonedDateTime making time-based logic in Scala 🧈✨ smooth like butter.
-Part of [d4s](https://github.com/mattlianje/d4)
+Part of [d4](https://github.com/mattlianje/d4)
 
 
 ## Features
