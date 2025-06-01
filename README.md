@@ -14,7 +14,7 @@ Part of [d4](https://github.com/mattlianje/d4)
 - Forces correct time handling with type-safe constructors
 - Duration arithmetic that reads like English
 - Effortlessly extensible with custom parsers and business rules
-- Prevent timezone bugs forever: assume Zulu time, require IANA zones
+- Prevent timezone bugs forever: assume ZULU, require IANA zones
 - Drop **EzTime.scala** into your project like a header-file
 
 **EzTime** is on MavenCentral
