@@ -7,13 +7,14 @@
 **Time, made simple**
 
 A minimalist, zero-dependency wrapper around ZonedDateTime making time-based logic in Scala 🧈✨ smooth like butter.
-Part of [d4s](https://github.com/mattlianje/d4s)
+Part of [d4](https://github.com/mattlianje/d4)
 
 
 ## Features
 - Forces correct, type-safe time handling
 - Duration arithmetic that reads like English
-- Easily extensible w/ your business rules
+- Effortlessly extensible with custom parsers and business rules
+- Prevent timezone bugs forever: assume ZULU, require IANA zones
 - Drop **EzTime.scala** into your project like a header-file
 
 **EzTime** is on MavenCentral
