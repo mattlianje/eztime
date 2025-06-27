@@ -1,4 +1,4 @@
-//> using dep "org.scalameta::munit:1.0.3"
+//> using dep "org.scalameta::munit:1.1.1"
 //> using scala "2.13"
 
 //> using publish.name "eztime"

@@ -23,7 +23,6 @@ object TestExtensions {
 }
 
 class EzTimeTest extends munit.FunSuite {
-  import EzTimeDuration._
 
   test("parse valid ISO-8601 datetime strings") {
     val formats = List(
@@ -94,6 +93,7 @@ class EzTimeTest extends munit.FunSuite {
       assertEquals(current.toString, first.toString)
     }
   }
+
   test("parse with timezone preservation") {
     val parisTime =
       EzTime.fromString("2024-03-21T15:30:00+01:00[Europe/Paris]").get
@@ -136,15 +136,53 @@ class EzTimeTest extends munit.FunSuite {
     }
   }
 
-  test("demonstrate difference between inZone and asZone") {
+  test("demonstrate difference between toZone and atZone") {
     val londonTime =
       EzTime.fromStringOrThrow("2024-03-21T14:00:00+00:00[Europe/London]")
 
-    val parisTimeInZone = londonTime.inZoneOrThrow("Europe/Paris")
-    assertEquals(parisTimeInZone.zdt.getHour, 15)
+    // toZone changes the wall clock time to show the same instant in different timezone
+    val parisTimeToZone = londonTime.toZoneOrThrow("Europe/Paris")
+    assertEquals(parisTimeToZone.zdt.getHour, 15) // 14:00 London = 15:00 Paris
 
-    val parisTimeAsZone = londonTime.asZoneOrThrow("Europe/Paris")
-    assertEquals(parisTimeAsZone.zdt.getHour, 14)
+    // atZone keeps the same wall clock time but changes the timezone interpretation
+    val parisTimeAtZone = londonTime.atZoneOrThrow("Europe/Paris")
+    assertEquals(
+      parisTimeAtZone.zdt.getHour,
+      14
+    ) // Same local time, different timezone
+  }
+
+  test("test all format getters") {
+    val time =
+      EzTime.fromStringOrThrow("2024-03-21T15:30:45.123456+01:00[Europe/Paris]")
+
+    assertEquals(time.getYmdString, "2024-03-21")
+    assertEquals(time.getYmdHmsString, "2024-03-21 15:30:45")
+    assertEquals(time.getYmdHmsTzString, "2024-03-21 15:30:45 +01:00")
+    assertEquals(time.getIsoTzString, "2024-03-21T15:30:45+01:00")
+    assertEquals(time.getIsoString, "2024-03-21T15:30:45")
+    assertEquals(time.getShortTimeString, "15:30")
+    assertEquals(time.getTimeString, "15:30:45")
+    assertEquals(time.getYearString, "2024")
+    assertEquals(time.getMonthString, "03")
+    assertEquals(time.getDayString, "21")
+
+    // Test component getters
+    assertEquals(time.getYear, 2024)
+    assertEquals(time.getMonth, 3)
+    assertEquals(time.getDay, 21)
+    assertEquals(time.getHour, 15)
+    assertEquals(time.getMinute, 30)
+    assertEquals(time.getSecond, 45)
+  }
+
+  test("test microseconds formats") {
+    val time = EzTime.fromStringOrThrow("2024-03-21T15:30:45.123456+01:00")
+
+    // Note: Java time only supports nanoseconds, so microseconds will be padded
+    assert(time.getIsoMicrosecondsTzString.startsWith("2024-03-21T15:30:45"))
+    assert(time.getIsoMicrosecondsTzString.contains("+01:00"))
+    assert(time.getIsoMicrosecondsString.startsWith("2024-03-21T15:30:45"))
   }
 
   test("handle various duration units") {
@@ -300,5 +338,22 @@ class EzTimeTest extends munit.FunSuite {
     assertEquals(implicitEz.toZdt.getZone.getId, "Europe/Paris")
     assertEquals(explicitEz.toZdt.getZone.getId, "Europe/Paris")
     assertEquals(explicitEz.toZdt.getOffset.toString, "+01:00")
+  }
+
+  test("test conversion methods") {
+    val time =
+      EzTime.fromStringOrThrow("2024-03-21T15:30:45+01:00[Europe/Paris]")
+
+    val localDate = time.toLocalDate
+    assertEquals(localDate.getYear, 2024)
+    assertEquals(localDate.getMonthValue, 3)
+    assertEquals(localDate.getDayOfMonth, 21)
+
+    val localDateTime = time.toLocalDateTime
+    assertEquals(localDateTime.getHour, 15)
+    assertEquals(localDateTime.getMinute, 30)
+
+    val instant = time.toInstant
+    assert(instant != null)
   }
 }

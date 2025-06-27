@@ -11,10 +11,9 @@ Part of [d4s](https://github.com/mattlianje/d4s)
 
 
 ## Features
-- Forces correct time handling with type-safe constructors
+- Forces correct, type-safe time handling
 - Duration arithmetic that reads like English
-- Effortlessly extensible with custom parsers and business rules
-- Prevent timezone bugs forever: assume Zulu time, require IANA zones
+- Easily extensible w/ your business rules
 - Drop **EzTime.scala** into your project like a header-file
 
 **EzTime** is on MavenCentral
@@ -27,20 +26,13 @@ Try it in your repl:
 scala-cli repl --dep xyz.matthieucourt:eztime_2.13:0.0.3
 ```
 
-To get started:
-
+All you need:
 ```scala
 import eztime._
 ```
 
-And to use the **EzTime** duration implicits:
-```scala
-import eztime.EzTimeDuration._
-```
-
-
 ## Core Concepts
-#### `EzTime`  
+### `EzTime`  
 A wrapper around ZonedDateTime. You must instantiate an **EzTime** with the `fromString` or `fromStringOrThrow` smart constructors. This prevents invalidate date strings from ever entering your domain.
 ```scala
 val myTime = EzTime.fromString("2024-01-01")
@@ -50,7 +42,7 @@ val myTime = EzTime.fromString("2024-01-01")
 EzTime.now
 ```
 
-#### `EzTimeDuration`
+#### Duration DSL
 Natural duration syntax, with no headscratching or thinking about pulling in ChronoUnits. You can use singular or plural of all units from `nano(s)` to `year(s)`
 ```scala
 val laterTime = myTime + 3.days + 9.secs - 4.nanos
@@ -74,7 +66,7 @@ EzTime supports these duration units:
 ## Timezone Operations
 **EzTime** provides 2 distinct ways to handle timezones:
 
-1. `inZone`: Changes the wall time to the new timezone
+1. `toZone`: Changes the wall clock time to show the same instant in a different time zone
 ```scala
 /* It's 2 PM in London */
 val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
@@ -83,7 +75,7 @@ val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").g
 val parisWallTime = londonTime.inZone("Europe/Paris")
 ```
 
-2. `asZone`: Preserves the instant in time, adjusts the timezone
+2. `atZone`: Keeps the same wall clock time but re-interprets the time zone
 ```scala
 /* It's 2 PM in London */
 val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
@@ -91,6 +83,32 @@ val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").g
 /* Shows as 2 PM in Paris */
 val parisSameInstant = londonTime.asZone("Europe/Paris")
 ```
+
+## Format Getters
+EzTime provides comprehensive getters for common datetime formats:
+```scala
+val time = EzTime.fromStringOrThrow("2024-03-21T15:30:45+01:00[Europe/Paris]")
+
+time.getYmdString             // "2024-03-21"
+time.getYmdHmsString          // "2024-03-21 15:30:45"
+time.getYmdHmsTzString        // "2024-03-21 15:30:45 +01:00"
+time.getIsoString             // "2024-03-21T15:30:45"
+time.getIsoTzString           // "2024-03-21T15:30:45+01:00"
+time.getShortTimeString       // "15:30"
+time.getTimeString            // "15:30:45"
+time.getYearString            // "2024"
+time.getMonthString           // "03"
+time.getDayString             // "21"
+
+// Component access
+time.getYear                  // 2024
+time.getMonth                 // 3
+time.getDay                   // 21
+time.getHour                  // 15
+time.getMinute                // 30
+time.getSecond                // 45
+```
+
 
 ## Adding Business Logic and Formatters
 **EzTime**'s extension system lets you encapsulate your domain specific time logic
@@ -168,7 +186,40 @@ val formattedString: String =
     myEzt.toStringOrThrow("yyyy年MM月dd日") /* Returns: 2024年01月10日 */
 ```
 
-## Date String Formats
+### Custom Formatters
+Add custom formats that fromString will handle:
+```scala
+object MyEzTimeExtensions {
+  import java.time.format._
+
+  implicit val myFormatters: Seq[DateTimeFormatter] = Seq(
+    DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm")
+  )
+}
+```
+
+Initially this will give None:
+```scala
+val chineseTime = "2024年03月21日 15:30"
+EzTime.fromString(chineseTime) // None
+```
+
+But import your EzTime extensions and it works:
+```scala
+import MyEzTimeExtensions._
+
+EzTime.fromString(chineseTime) // Some(2024-03-21T15:30:00Z)
+```
+
+You can format your EzTime with custom patterns using `toString` / `toStringOrThrow`:
+```scala
+val myEzt = EzTime.fromString("2024-01-10").get
+
+myEzt.toString                           // "2024-01-10T00:00:00Z"
+myEzt.toStringOrThrow("yyyy年MM月dd日")  // "2024年01月10日"
+```
+
+## Supported Date String Formats
 EzTime supports parsing a variety of date-time formats out of the box:
 
 | Format | Example | Notes |
@@ -207,3 +258,18 @@ val zoned = dateTime.atZone(ZoneId.systemDefault()) /* Dangerous implicit conver
 val time = EzTime.fromStringOrThrow("2024-03-21 15:30")
 val nyTime = time.toZoneOrThrow("America/New_York") /* Explicit about our intentions */
 ```
+
+## FAQ
+**Q: Why not just use ZonedDateTime?**
+A: ZonedDateTime is great - but the cocktail of LocalDate's and Timestamps and subtle conversions to
+the system's clock are lethal footguns.
+
+**Q: Performance overhead?**
+A: Almost zero - it's a thin wrapper that delegates to ZonedDateTime.
+
+**Q: Why assume UTC by default?**
+A: UTC is universal truth. EzTime.fromString("2024-01-01") has zero ambiguity - and the World would be so much
+beter if non utc operations were left to the presentation layer.
+
+**Q: Migration from existing code?**
+A: Easy - implicit conversions let you adopt incrementally: val ezTime: EzTime = myZonedDateTime
