@@ -262,15 +262,15 @@ val nyTime = time.toZoneOrThrow("America/New_York") /* Explicit about our intent
 
 ## FAQ
 **Q: Why not just use ZonedDateTime?**
-A: ZonedDateTime is great - but the cocktail of LocalDate's and Timestamps and subtle conversions to
+- ZonedDateTime is great - but the cocktail of LocalDate's and Timestamps and subtle conversions to
 the system's clock are lethal footguns.
 
 **Q: Performance overhead?**
-A: Almost zero - it's a thin wrapper that delegates to ZonedDateTime.
+- Almost zero - it's a thin wrapper that delegates to ZonedDateTime.
 
 **Q: Why assume UTC by default?**
-A: UTC is universal truth. EzTime.fromString("2024-01-01") has zero ambiguity - and the World would be so much
+- UTC is universal truth. EzTime.fromString("2024-01-01") has zero ambiguity - and the World would be so much
 beter if non utc operations were left to the presentation layer.
 
 **Q: Migration from existing code?**
-A: Easy - implicit conversions let you adopt incrementally: val ezTime: EzTime = myZonedDateTime
+- Easy - implicit conversions let you adopt incrementally: val ezTime: EzTime = myZonedDateTime
