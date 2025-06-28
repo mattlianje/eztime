@@ -13,8 +13,8 @@ Part of [d4](https://github.com/mattlianje/d4)
 ## Features
 - Forces correct, type-safe time handling
 - Duration arithmetic that reads like English
-- Effortlessly extensible with custom parsers and business rules
-- Prevent timezone bugs forever: assume ZULU, require IANA zones
+- Easily add your business logic
+- Prevent timezone bugs
 - Drop **EzTime.scala** into your project like a header-file
 
 **EzTime** is on MavenCentral
