@@ -242,35 +242,23 @@ Time is a deceptively complex domain. Java's ZonedDateTime is an excellent found
 
 Ultimately, **EzTime** is just a zdt wrapper to force teams to code correctly and make working with time logic beautiful.
 
-- **Forced Correctness**: EzTime's smart constructors ensure that invalid timestamps never enter your system. This isn't just about convenience - it's about making invalid states unrepresentable at the type level. The library enforces a powerful 2-step system that eliminates a whole class of timezone bugs
-    1. All timestamps are UTC/Zulu unless explicitly specified
-    2. Non-UTC times must use IANA identifiers (e.g., "America/New_York") rather than raw offsets
-
-- **Business Logic as Types**: Rather than spreading time-related business logic throughout your codebase, **EzTime** encourages encapsulating it in type-safe extensions. This means your domain rules about time become part of your type system.
-
-Consider this common bug:
-```scala
-/* Without EzTime - Subtle bug! */
-val timestamp = "2024-03-21 15:30"                  /* Which timezone? Server time? UTC? User's local time */
-val dateTime = LocalDateTime.parse(timestamp)       /* Silent assumption about format */
-val zoned = dateTime.atZone(ZoneId.systemDefault()) /* Dangerous implicit conversion */
-
-/* With EzTime - Explicit and safe */
-val time = EzTime.fromStringOrThrow("2024-03-21 15:30")
-val nyTime = time.toZoneOrThrow("America/New_York") /* Explicit about our intentions */
-```
 
 ## FAQ
 **Q: Why not just use ZonedDateTime?**
-A: ZonedDateTime is great - but the cocktail of LocalDate's and Timestamps and subtle conversions to
-the system's clock are lethal footguns.
+A: ZonedDateTime is great - but the cocktail of LocalDates and Timestamps and subtle conversions to
+the system's clock when stringifying are lethal footguns.
+
+**Q: But seriously, why not ZonedDateTime?**
+A: Forced correctness is a nice, and doing it with a smooth API is even nicer. With EzTime:
+- All timestamps are UTC/Zulu unless specified otherwise
+- Non-UTC times must use IANA identifiers (e.g, "America/New_York") rather than raw offsets
 
 **Q: Performance overhead?**
 A: Almost zero - it's a thin wrapper that delegates to ZonedDateTime.
 
 **Q: Why assume UTC by default?**
-A: UTC is universal truth. EzTime.fromString("2024-01-01") has zero ambiguity - and the World would be so much
-beter if non utc operations were left to the presentation layer.
+A: UTC is universal truth. EzTime.fromString("2024-01-01") has zero ambiguity - and the World would be
+better if non utc operations were left to the presentation layer.
 
 **Q: Migration from existing code?**
 A: Easy - implicit conversions let you adopt incrementally: val ezTime: EzTime = myZonedDateTime
