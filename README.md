@@ -6,15 +6,15 @@
 
 **Time, made simple**
 
-A minimalist, zero-dependency wrapper around ZonedDateTime making time-based logic in Scala 🧈✨ smooth like butter.
+A minimalist, zero-dependency lib making time-based logic in Scala 🧈✨ smooth like butter.
 Part of [d4](https://github.com/mattlianje/d4)
 
 
 ## Features
 - Forces correct, type-safe time handling
 - Duration arithmetic that reads like English
-- Effortlessly extensible with custom parsers and business rules
-- Prevent timezone bugs forever: assume ZULU, require IANA zones
+- Easily add your business logic
+- Prevent timezone bugs
 - Drop **EzTime.scala** into your project like a header-file
 
 **EzTime** is on MavenCentral
@@ -254,11 +254,11 @@ A: Forced correctness is a nice, and doing it with a smooth API is even nicer. W
 - Non-UTC times must use IANA identifiers (e.g, "America/New_York") rather than raw offsets
 
 **Q: Performance overhead?**
-A: Almost zero - it's a thin wrapper that delegates to ZonedDateTime.
+- Almost zero - it's a thin wrapper that delegates to ZonedDateTime.
 
 **Q: Why assume UTC by default?**
 A: UTC is universal truth. EzTime.fromString("2024-01-01") has zero ambiguity - and the World would be
 better if non utc operations were left to the presentation layer.
 
 **Q: Migration from existing code?**
-A: Easy - implicit conversions let you adopt incrementally: val ezTime: EzTime = myZonedDateTime
+- Easy - implicit conversions let you adopt incrementally: val ezTime: EzTime = myZonedDateTime
