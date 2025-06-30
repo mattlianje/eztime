@@ -67,7 +67,8 @@ EzTime supports these duration units:
 ## Timezone Operations
 **EzTime** provides 2 distinct ways to handle timezones:
 
-1. `toZone`: Changes the wall clock time to show the same instant in a different time zone
+#### `toZone`
+Changes the wall clock time to show the same instant in a different time zone
 ```scala
 /* It's 2 PM in London */
 val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
@@ -76,7 +77,8 @@ val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").g
 val parisWallTime = londonTime.inZone("Europe/Paris")
 ```
 
-2. `atZone`: Keeps the same wall clock time but re-interprets the time zone
+#### `atZone`
+Keeps the same wall clock time but re-interprets the time zone
 ```scala
 /* It's 2 PM in London */
 val londonTime = EzTime.fromString("2024-03-21T14:00:00+00:00[Europe/London]").get
@@ -115,7 +117,7 @@ time.getSecond                // 45
 **EzTime**'s extension system lets you encapsulate your domain specific time logic
 
 ```scala
-object BusinessRules {
+object MyBusinessRules {
   implicit class TradingHours(val time: EzTime) {
     import eztime.EzTimeDuration._
     import java.time._
@@ -124,73 +126,31 @@ object BusinessRules {
       val day = time.zdt.getDayOfWeek
       day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY
     }
-    
-    def isNyseHours: Boolean = {
-      if (isWeekend) false 
-      else {
-        val nyTime = time.inZoneOrThrow("America/New_York")
-        val hour = nyTime.zdt.getHour
-        hour >= 9 && hour < 16
-      }
-    }
-    
-    def nextBusinessDay: EzTime = 
-      LazyList.iterate(time + 1.day)(_ + 1.day)
-        .dropWhile(_.isWeekend)
-        .head
-  }
 }
 ```
 
 Then just use your business logic naturally as if it were baked into **EzTime**
 ```scala
-import BusinessRules._
+import MyBusinessRules._
 
-val now = EzTime.fromString("2024-03-21T12:30:00Z").get
+val t = EzTime.fromString("2024-03-21").get
 
-if (!now.isWeekend && now.isNyseHours) {
-  println("Doing my business logic")
-}
-
-val nextDay = now.nextBusinessDay + 1.day
-println(s"next-day + 1: ${nextDay} - the power of EzTime + EzTimeDuration!")
-```
-
-Add custom formats that `fromString` will handle:
-```scala
-object MyEzTimeExtensions {
-    import java.time.format._
-
-    implicit val myFormatters: Seq[DateTimeFormatter] = Seq(
-     DateTimeFormatter.ofPattern("yyyy年MM月dd日 HH:mm")
-    )
-}
-```
-Initially this will give None:
-```scala
-val chineseTime = "2024年03月21日 15:30"
-EzTime.fromString(chineseTime) /* None */
-```
-But import your **EzTime** extensions and tada!
-```scala
-import MyEzTimeExtensions._
-
-EzTime.fromString(chineseTime) /* Some(2024-03-21T15:30:00Z) */
+if (t.isWeekend) println("Yay!)
 ```
 
 You can get a formatted string of your **EzTime** with toString / toStringOrThrow:
 ```scala
-val myEzt = EzTime.fromString("2024-01-10").get
+val ezt = EzTime.fromStringOrThrow("2024-01-10")
 
-myEzt.toString                             /* Returns default: 2024-01-10T00:00:00Z */
+ezt.toString                              /* Returns default: 2024-01-10T00:00:00Z */
 val formattedString: String =
-    myEzt.toStringOrThrow("yyyy年MM月dd日") /* Returns: 2024年01月10日 */
+    ezt.toStringOrThrow("yyyy年MM月dd日") /* Returns: 2024年01月10日 */
 ```
 
 ### Custom Formatters
 Add custom formats that fromString will handle:
 ```scala
-object MyEzTimeExtensions {
+object MyCustomFormats {
   import java.time.format._
 
   implicit val myFormatters: Seq[DateTimeFormatter] = Seq(
@@ -207,14 +167,14 @@ EzTime.fromString(chineseTime) // None
 
 But import your EzTime extensions and it works:
 ```scala
-import MyEzTimeExtensions._
+import MyCustomFormats._
 
 EzTime.fromString(chineseTime) // Some(2024-03-21T15:30:00Z)
 ```
 
 You can format your EzTime with custom patterns using `toString` / `toStringOrThrow`:
 ```scala
-val myEzt = EzTime.fromString("2024-01-10").get
+val myEzt = EzTime.fromStringOrThrow("2024-01-10")
 
 myEzt.toString                           // "2024-01-10T00:00:00Z"
 myEzt.toStringOrThrow("yyyy年MM月dd日")  // "2024年01月10日"
