@@ -245,19 +245,19 @@ Ultimately, **EzTime** is just a zdt wrapper to force teams to code correctly an
 
 ## FAQ
 **Q: Why not just use ZonedDateTime?**
-A: ZonedDateTime is great - but the cocktail of LocalDates and Timestamps and subtle conversions to
+- ZonedDateTime is great - but the cocktail of LocalDates and Timestamps and subtle conversions to
 the system's clock when stringifying are lethal footguns.
 
 **Q: But seriously, why not ZonedDateTime?**
-A: Forced correctness is a nice, and doing it with a smooth API is even nicer. With EzTime:
-- All timestamps are UTC/Zulu unless specified otherwise
-- Non-UTC times must use IANA identifiers (e.g, "America/New_York") rather than raw offsets
+- Forced correctness is a nice, and doing it with a smooth API is even nicer. With EzTime:
+  - All timestamps are UTC/Zulu unless specified otherwise
+  - Non-UTC times must use IANA identifiers (e.g, "America/New_York") rather than raw offsets
 
 **Q: Performance overhead?**
 - Almost zero - it's a thin wrapper that delegates to ZonedDateTime.
 
 **Q: Why assume UTC by default?**
-A: UTC is universal truth. EzTime.fromString("2024-01-01") has zero ambiguity - and the World would be
+- UTC is universal truth. EzTime.fromString("2024-01-01") has zero ambiguity - and the World would be
 better if non utc operations were left to the presentation layer.
 
 **Q: Migration from existing code?**
