@@ -144,10 +144,10 @@ val ezt = EzTime.fromStringOrThrow("2024-01-10")
 
 ezt.toString                              /* Returns default: 2024-01-10T00:00:00Z */
 val formattedString: String =
-    ezt.toStringOrThrow("yyyy年MM月dd日") /* Returns: 2024年01月10日 */
+    ezt.toStringOrThrow("yyyy年MM月dd日")  /* Returns: 2024年01月10日 */
 ```
 
-### Custom Formatters
+### Parsing Custom Timestamps
 Add custom formats that fromString will handle:
 ```scala
 object MyCustomFormats {
@@ -162,22 +162,22 @@ object MyCustomFormats {
 Initially this will give None:
 ```scala
 val chineseTime = "2024年03月21日 15:30"
-EzTime.fromString(chineseTime) // None
+EzTime.fromString(chineseTime) /* None */
 ```
 
 But import your EzTime extensions and it works:
 ```scala
 import MyCustomFormats._
 
-EzTime.fromString(chineseTime) // Some(2024-03-21T15:30:00Z)
+EzTime.fromString(chineseTime) /* Some(2024-03-21T15:30:00Z) */
 ```
 
 You can format your EzTime with custom patterns using `toString` / `toStringOrThrow`:
 ```scala
 val myEzt = EzTime.fromStringOrThrow("2024-01-10")
 
-myEzt.toString                           // "2024-01-10T00:00:00Z"
-myEzt.toStringOrThrow("yyyy年MM月dd日")  // "2024年01月10日"
+myEzt.toString                          /* "2024-01-10T00:00:00Z" */
+myEzt.toStringOrThrow("yyyy年MM月dd日")  /* "2024年01月10日" */
 ```
 
 ## Supported Date String Formats
