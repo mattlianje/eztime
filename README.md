@@ -122,10 +122,11 @@ object MyBusinessRules {
     import eztime.EzTimeDuration._
     import java.time._
 
-    def isWeekend: Boolean = {
-      val day = time.zdt.getDayOfWeek
-      day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY
+     def isWeekend: Boolean = {
+       val day = time.zdt.getDayOfWeek
+       day == DayOfWeek.SATURDAY || day == DayOfWeek.SUNDAY
     }
+  }
 }
 ```
 
